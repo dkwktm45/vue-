@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2>제목</h2>
-    <p>내용</p>
-    <p class="text-muted">2020-10-01</p>
+    <h2>{{form.title}}</h2>
+    <p>{{form.content}}</p>
+    <p class="text-muted">{{form.createdAt}}</p>
     <hr class="my-4" />
     <div class="row g-2">
       <div class="col-auto">
@@ -29,17 +29,33 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useRoute } from 'vue-router';
-
+import { getPostById } from '@/api/posts';
+import { ref } from '@vue/reactivity';
 const router = useRouter();
-const route = useRoute();
-const id = route.params.id;
+/**
+ * 기존에는 route 방식으로 id를 통한 게시판 details 구현을 해줬다 하지만 route가 아닌
+ * props로도 가능하다.
+ */
+/* const route = useRoute();
+const id = route.params.id; */
+const props  = defineProps({
+  id: Number,
+})
+
+// ref : 한꺼번에 객체 할당 가능
+// reactive : 하나의 value만 할당 가능 아니라면 object로 선언된다.
+const form = ref({})
+
+const fetchPost = () =>{
+  const data = getPostById(props.id);
+  form.value = {...data}
+}
+fetchPost()
 const goListPage = () => {
   router.push({ name: 'PostList' });
 };
-
 const goEditPage = () => {
-  router.push({ name: 'PostEdit', params: { id } });
+  router.push({ name: 'PostEdit', params: { id : props.id } });
 };
 </script>
 
